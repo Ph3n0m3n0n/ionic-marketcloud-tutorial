@@ -21,6 +21,23 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
 })
+.service('DataService',function(){
+  return {
+    products : [
+            { name: "White Trash, Two Heebs and a Bean", id: 1, price : 9.00, artist: "NOFX", year: 1992, images:["http://www.marketcloud.it/img/placeholder.png"]},
+            { name: "Punk in Drublic", id: 2, price : 9.00, artist: "NOFX", year: 1994, images:["http://www.marketcloud.it/img/placeholder.png"]  },
+            { name: "And out comes the wolf", id: 3, price : 9.00, artist: "Rancid", year: 1995, images:["http://www.marketcloud.it/img/placeholder.png"]  },
+            { name: "Hard Rock Bottom", id: 4, price : 9.00, artist: "No Use For A Name", year: 2001, images:["http://www.marketcloud.it/img/placeholder.png"]  },
+            { name: "Blaze", id: 5, price : 9.00, artist: "Lagwagon", year: 2003, images:["http://www.marketcloud.it/img/placeholder.png"]  },
+          ],
+    list : function(){
+      return this.products;
+    },
+    getById : function(id) {
+      return this.products[id-1]
+    }
+  }
+})
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
@@ -49,25 +66,35 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         }
       }
     })
-    .state('app.playlists', {
-      url: '/playlists',
+    .state('app.products', {
+      url: '/products',
       views: {
         'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
+          templateUrl: 'templates/products.html',
+          controller: 'ProductsCtrl'
+        }
+      },
+      resolve: {
+        products : function(DataService){
+          return DataService.list()
         }
       }
     })
 
-  .state('app.single', {
-    url: '/playlists/:playlistId',
+  .state('app.product', {
+    url: '/products/:productId',
     views: {
       'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+        templateUrl: 'templates/product.html',
+        controller: 'ProductCtrl'
       }
-    }
+    },
+    resolve: {
+        product : ['DataService','$stateParams',function(DataService,$stateParams){
+                  return DataService.getById($stateParams.productId)
+                }]
+      }
   });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/app/products');
 });
