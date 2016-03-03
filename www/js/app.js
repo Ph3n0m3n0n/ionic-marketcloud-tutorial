@@ -21,23 +21,35 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
 })
-.service('DataService',function(){
+.factory('marketcloud',function(){
+  marketcloud.public = '86837aa0-1a7c-4ec2-848a-ce51fed364e3';
+  return marketcloud;
+})
+.service('DataService',['$q','marketcloud',function($q,marketcloud){
   return {
-    products : [
-            { name: "White Trash, Two Heebs and a Bean", id: 1, price : 9.00, artist: "NOFX", year: 1992, images:["http://www.marketcloud.it/img/placeholder.png"]},
-            { name: "Punk in Drublic", id: 2, price : 9.00, artist: "NOFX", year: 1994, images:["http://www.marketcloud.it/img/placeholder.png"]  },
-            { name: "And out comes the wolf", id: 3, price : 9.00, artist: "Rancid", year: 1995, images:["http://www.marketcloud.it/img/placeholder.png"]  },
-            { name: "Hard Rock Bottom", id: 4, price : 9.00, artist: "No Use For A Name", year: 2001, images:["http://www.marketcloud.it/img/placeholder.png"]  },
-            { name: "Blaze", id: 5, price : 9.00, artist: "Lagwagon", year: 2003, images:["http://www.marketcloud.it/img/placeholder.png"]  },
-          ],
-    list : function(){
-      return this.products;
+    list : function(query){
+     return $q(function(resolve,reject){
+        marketcloud.products.list(query || {},function(err,product){
+          if (err)
+            reject(err)
+          else
+            resolve(product)
+        })
+      })
+
     },
     getById : function(id) {
-      return this.products[id-1]
+      return $q(function(resolve,reject){
+        marketcloud.products.getById(id,function(err,product){
+          if (err)
+            reject(err);
+          else
+            resolve(product)
+        })
+      })
     }
   }
-})
+}])
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
@@ -75,8 +87,8 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         }
       },
       resolve: {
-        products : function(DataService){
-          return DataService.list()
+        products : function(DataService,$stateParams){
+          return DataService.list($stateParams || {})
         }
       }
     })
