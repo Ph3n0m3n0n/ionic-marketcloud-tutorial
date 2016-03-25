@@ -47,4 +47,11 @@ angular.module('starter.controllers', [])
 
 .controller('ProductCtrl', function($scope, product) {
   $scope.product = product;
-});
+})
+
+.controller('CartCtrl',function($scope){
+  $scope.cart = {
+    items : []
+  }
+})
+

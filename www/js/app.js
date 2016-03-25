@@ -31,9 +31,9 @@ angular.module('starter', ['ionic', 'starter.controllers'])
      return $q(function(resolve,reject){
         marketcloud.products.list(query || {},function(err,product){
           if (err)
-            reject(err)
+            reject(err);
           else
-            resolve(product)
+            resolve(product);
         })
       })
 
@@ -69,7 +69,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       }
     }
   })
-
+  .state('app.cart', {
+      url: '/cart',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/cart.html',
+          controller: 'CartCtrl'
+        }
+      }
+  })
   .state('app.browse', {
       url: '/browse',
       views: {
@@ -105,7 +113,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         product : ['DataService','$stateParams',function(DataService,$stateParams){
                   return DataService.getById($stateParams.productId)
                 }]
-      }
+    }
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/products');
