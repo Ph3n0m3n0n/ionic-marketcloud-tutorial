@@ -1,9 +1,39 @@
 <ion-view view-title="Cart">
-  <ion-content>
-
-    <div ng-show="cart.items.length === 0">
-      <div>Cart is empty</div>
-    </div>
-
-  </ion-content>
+<ion-content>
+<!-- if the cart has no elements -->
+<div ng-show="cart.items.length === 0">
+	<div>Your Cart is empty</div>
+</div>
+<!-- if the cart has some products -->
+<div ng-hide="cart.items.length === 0">
+	
+	<div class="list">
+		<div ng-repeat="item in cart.items"
+			class="item item-thumbnail-left">
+			<img ng-src="{{item.images[0]}}">
+			<h2>{{ item.name }} (<span ng-repeat="(key,value) in getVariantValues(item)">{{value}} </span>)</h2>
+			<h4>$ {{ item.price }}</h4>
+			<div style="font-size:18px;">
+				<a class="ion ion-plus"
+					style="margin-right:20px;"
+					ng-click="increase(item)"
+				></a>
+				<span>{{item.quantity}}</span>
+				<a class="ion ion-minus"
+					style="margin-left:20px;"
+					ng-click="decrease(item)"
+				></a>
+			</div>
+		</div>
+		<div class="item">
+			<div class="padding">
+				<h3>Total: $ {{getCartTotal()}}</h3>
+			</div>
+		</div>
+	</div>
+	<div class="padding" ng-show="cart.items.length > 0">
+		<a class="button button-positive button-block" href="#/app/checkout"><span class="ion ion-android-done-all"></span> Checkout</a>
+	</div>
+</div>
+</ion-content>
 </ion-view>

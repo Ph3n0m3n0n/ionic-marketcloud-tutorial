@@ -45,13 +45,38 @@ angular.module('starter.controllers', [])
   $scope.products = products;
 })
 
-.controller('ProductCtrl', function($scope, product) {
+.controller('ProductCtrl', function($scope, product, $ionicLoading, CartService, $ionicPopup) {
   $scope.product = product;
+
+      $scope.addToCart = function() { 
+
+      $ionicLoading.show({template : 'Adding to cart...'});
+
+      CartService.add([{
+          product_id: $scope.product.id,
+          quantity: 1
+        }])
+        .then(function(cart){
+          $ionicLoading.hide();
+          $ionicPopup.alert({
+              title: 'Message',
+              template: 'The item was added to cart'
+          });
+        })
+        .catch(function(error){
+          $ionicLoading.hide();
+          $ionicPopup.alert({
+              title: "Error",
+              template: "An error has occurred, please try again."
+          })
+        })
+    }
+
+
+
 })
 
-.controller('CartCtrl',function($scope){
-  $scope.cart = {
-    items : []
-  }
+.controller('CartCtrl',function($scope,cart){
+  $scope.cart = cart;
 })
 

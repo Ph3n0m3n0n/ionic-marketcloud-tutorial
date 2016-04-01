@@ -21,6 +21,32 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     }
   });
 })
+
+
+.run(function(CartService){
+  
+
+
+  var promise = null;
+
+  if (window.localStorage['marketcloud.cart_id']){
+    promise = CartService.getById(window.localStorage['marketcloud.cart_id']);
+  }
+  else{
+    promise = CartService.create([]);
+  }
+  
+  promise
+  .then(function(data){
+    window.localStorage['marketcloud.cart_id'] = data.id;
+  })
+  .catch(function(err){
+    console.log("Unable to init the cart")
+  })
+
+})
+
+
 .factory('marketcloud',function(){
   marketcloud.public = '86837aa0-1a7c-4ec2-848a-ce51fed364e3';
   return marketcloud;
@@ -51,6 +77,90 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   }
 }])
 
+.service('CartService',function(marketcloud,$q){
+  return {
+    data : null,
+    // Returns a cart by id
+    getById : function(id) {
+      var _this = this;
+      return $q(function(resolve,reject){
+        marketcloud.carts.getById(id,function(err,cart){
+          if (err)
+            reject(err)
+          else{
+            _this.data = cart;
+            resolve(cart)
+          }
+        })
+      })
+    },
+    //Creates a new cart 
+    create : function(items) {
+      var _this = this;
+
+      return $q(function(resolve,reject){
+        marketcloud.carts.create(items || [],function(err,cart){
+          if (err)
+            reject(err)
+          else{
+            _this.data = cart;
+            resolve(cart)
+          }
+        })
+      })
+    },
+    //Add items to cart
+    add : function(items) {
+      var _this = this;
+      if (!this.data)
+        throw new Error("Cart must be initialized first!")
+      return $q(function(resolve,reject){
+        marketcloud.carts.add(_this.data.id,items,function(err,cart){
+          if (err)
+            reject(err)
+          else{
+            _this.data = cart;
+            resolve(cart)
+          }
+        })
+      })
+    },
+    //Updates cart's contents
+    update : function(update) {
+      var _this = this;
+      if (!this.data)
+        throw new Error("Cart must be initialized first!")
+      return $q(function(resolve,reject){
+        marketcloud.carts.update(_this.data.id,update,function(err,cart){
+          if (err)
+            reject(err)
+          else{
+            _this.data = cart;
+            resolve(cart)
+          }
+        })
+      })
+    },    
+    //removes items from the cart
+    remove : function(items) {
+      var _this = this;
+      if (!this.data)
+        throw new Error("Cart must be initialized first!")
+      return $q(function(resolve,reject){
+        marketcloud.carts.remove(_this.data.id,items,function(err,cart){
+          if (err)
+            reject(err)
+          else{
+            _this.data = cart;
+            resolve(cart)
+          }
+        })
+      })
+    },      
+  }
+})
+
+
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
@@ -75,6 +185,11 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         'menuContent': {
           templateUrl: 'templates/cart.html',
           controller: 'CartCtrl'
+        }
+      },
+      resolve:{
+        cart : function(CartService) {
+          return CartService.getById(window.localStorage['marketcloud.cart_id'])
         }
       }
   })
